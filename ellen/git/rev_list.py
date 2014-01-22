@@ -113,7 +113,11 @@ def _check_message(commit, query):
 
 # FIXME: add quick diff
 def _check_file_change(commit, path):
-    if path and commit.is_changed([path], no_diff=True)[0]:
+    if not path:
+        return True
+    if isinstance(path, unicode):
+        path = path.encode('utf-8')
+    if commit.is_changed([path], no_diff=True)[0]:
         return True
     #commit_tree = commit.tree
     #parents = commit.parents
@@ -132,5 +136,3 @@ def _check_file_change(commit, path):
     #            count += 1
     #    if count == len(parents):
     #        return True
-    elif not path:
-        return True
