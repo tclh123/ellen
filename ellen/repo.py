@@ -224,8 +224,9 @@ class Jagare(object):
         if target:
             target.fetch()
 
-    def fetch_(self, *w, **kw):
-        return fetch_repository(self.repository, *w, **kw)
+    def fetch_(self, remote_name=None, is_q=False, env=None):
+        return fetch_repository(self.repository, remote_name=remote_name,
+                                is_q=is_q, env=env)
 
     def merge(self, ref, msg='automerge', commit_msg='',
               no_ff=False, _raise=True, _env=None):
