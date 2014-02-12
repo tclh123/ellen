@@ -24,8 +24,8 @@ def _clone_and_fetch(from_repo, to_repo, worktree,
         tmp_repo.add_remote(remote_name,
                             from_repo.path)
         ref = '%s/%s' % (remote_name, from_ref)
-        # TODO: fetch remote_name
-        tmp_repo.fetch_all()
+    # TODO: fetch remote_name
+    tmp_repo.fetch_all()
 
     return tmp_repo, ref
 
@@ -46,11 +46,11 @@ def merge_flow(merger_name, merger_email,
 
         result = tmp_repo.merge(ref, message_header, message_body,
                                 no_ff=no_ff, _env=env)
-        if result.returncode != 0:
+        if result['returncode'] != 0:
             raise RepoMergeError
         result = tmp_repo.push('origin', to_ref,
                                _env={env_commiter_key: merger_name})
-        if result.returncode != 0:
+        if result['returncode'] != 0:
             raise RepoPushError
         merge_commit_sha = to_repo.sha(to_ref)
     except RepoMergeError:
@@ -69,7 +69,7 @@ def can_merge(tmpdir, from_repo, to_repo, from_ref, to_ref,
 
     result = tmp_repo.merge_commits(to_ref, ref)
 
-    if result and result.has_conflicts is False:
+    if result and result['has_conflicts'] is False:
         return True
     else:
         return False

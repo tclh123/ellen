@@ -86,4 +86,43 @@ class TestMerge(BareRepoTest):
         commit_something(path, branch=BR)
         repo.update_head(BARE_REPO_OTHER_BRANCH)
         merge_index = repo.merge_commits(repo.head.target.hex, BR)
-        assert merge_index['has_conflicts'] == False
+        assert merge_index['has_conflicts'] is False
+
+    def test_merge_flow(self):
+        repo = Jagare(self.path)
+        BR = 'br_test_merge'
+        sha1 = repo.sha(BARE_REPO_OTHER_BRANCH)
+
+        from_repo_path = self.get_temp_path()
+        from_repo = repo.clone(from_repo_path, branch=BARE_REPO_OTHER_BRANCH,
+                               bare=True)
+        ret = from_repo.create_branch(BR, BARE_REPO_OTHER_BRANCH)
+        assert ret
+        commit_something(from_repo_path, branch=BR)
+
+        tmpdir = self.get_temp_path()
+
+        # different repo
+        sha = repo.merge_flow('lh', 'lh@xxx.com',
+                              'test_header', 'test_body', tmpdir,
+                              from_repo_path, BR, BARE_REPO_OTHER_BRANCH,
+                              remote_name='hub/xxxproject', no_ff=True)
+        assert sha
+
+        sha2 = repo.sha(BARE_REPO_OTHER_BRANCH)
+
+        assert sha1 != sha2
+        assert repo.sha(sha1) == sha1
+
+        # same repo
+        tmpdir2 = self.get_temp_path()
+        from_sha1 = from_repo.sha(BARE_REPO_OTHER_BRANCH)
+        assert from_sha1 == sha1
+        sha = from_repo.merge_flow('lh', 'lh@xxx.com',
+                                   'test_header', 'test_body', tmpdir2,
+                                   from_repo_path, BR, BARE_REPO_OTHER_BRANCH,
+                                   no_ff=True)
+        assert sha
+        from_sha2 = from_repo.sha(BARE_REPO_OTHER_BRANCH)
+        assert from_sha1 != from_sha2
+        assert from_repo.sha(from_sha1) == from_sha1
