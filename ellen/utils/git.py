@@ -44,3 +44,18 @@ def resolve_type(repository, version):
     except KeyError:
         type = None
     return type
+
+
+def make_git_env(username=None, email=None, is_anonymous=False):
+    env = {}
+    if is_anonymous:
+        env['GIT_AUTHOR_NAME'] = 'anonymous'
+        env['GIT_AUTHOR_EMAIL'] = 'anonymous@douban.com'
+        env['GIT_COMMITTER_NAME'] = 'anonymous'
+        env['GIT_COMMITTER_EMAIL'] = 'anonymous@douban.com'
+    else:
+        env['GIT_AUTHOR_NAME'] = username
+        env['GIT_AUTHOR_EMAIL'] = email
+        env['GIT_COMMITTER_NAME'] = username
+        env['GIT_COMMITTER_EMAIL'] = email
+    return env

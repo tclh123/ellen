@@ -18,7 +18,8 @@ from ellen.git.init import init_repository
 from ellen.git.archive import archive_repository
 from ellen.git.blame import blame
 from ellen.git.format_patch import format_patch
-from ellen.git.merge import merge, merge_tree, merge_head, merge_commits
+from ellen.git.merge import (merge, merge_flow, can_merge,
+                             merge_tree, merge_head, merge_commits)
 from ellen.git.push import push
 from ellen.git.fetch import fetch_repository
 from ellen.git.hook import update_hooks
@@ -28,7 +29,7 @@ from ellen.utils.git import resolve_version, resolve_type
 
 
 class Jagare(object):
-    ''' pygit2 and git commands wrapper '''
+    """pygit2 and git commands wrapper"""
 
     def __init__(self, path):
         self.repository = repository(path)
@@ -156,7 +157,7 @@ class Jagare(object):
         clone_repository(url, path,
                          bare=bare, checkout_branch=branch,
                          mirror=mirror, env=env)
-        jagare = Jagare(path)
+        jagare = cls(path)
         if bare:
             update_server_info(jagare.repository)
         return jagare
@@ -232,6 +233,26 @@ class Jagare(object):
               no_ff=False, _raise=True, _env=None):
         return merge(self.repository, ref, msg, commit_msg,
                      no_ff, _raise, _env)
+
+    def merge_flow(self, merger_name, merger_email,
+                   message_header, message_body, tmpdir,
+                   from_repo_path, from_ref, to_ref,
+                   remote_name=None, no_ff=False):
+        """merge with worktree(tmpdir)"""
+        from_repo = Jagare(from_repo_path)
+        sha = merge_flow(merger_name, merger_email,
+                         message_header, message_body, tmpdir,
+                         from_repo=from_repo, to_repo=self,
+                         from_ref=from_ref, to_ref=to_ref,
+                         remote_name=remote_name, no_ff=no_ff)
+        return sha
+
+    def can_merge(self, tmpdir, from_repo, to_repo, from_ref, to_ref,
+                  remote_name=None):
+        """test auto merge"""
+        ret = can_merge(tmpdir, from_repo, to_repo, from_ref, to_ref,
+                        remote_name)
+        return ret
 
     def merge_tree(self, ours, theirs):
         return merge_tree(self.repository, ours, theirs)
