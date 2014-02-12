@@ -247,7 +247,6 @@ class Jagare(object):
                          remote_name=remote_name, no_ff=no_ff)
         return sha
 
-    # TODO: add UT
     def can_merge(self, tmpdir, from_repo_path, from_ref, to_ref,
                   remote_name=None):
         """test auto merge"""

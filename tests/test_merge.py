@@ -126,3 +126,21 @@ class TestMerge(BareRepoTest):
         from_sha2 = from_repo.sha(BARE_REPO_OTHER_BRANCH)
         assert from_sha1 != from_sha2
         assert from_repo.sha(from_sha1) == from_sha1
+
+    def test_can_merge(self):
+        repo = Jagare(self.path)
+        BR = 'br_test_merge'
+
+        from_repo_path = self.get_temp_path()
+        from_repo = repo.clone(from_repo_path, branch=BARE_REPO_OTHER_BRANCH,
+                               bare=True)
+        ret = from_repo.create_branch(BR, BARE_REPO_OTHER_BRANCH)
+        assert ret
+        commit_something(from_repo_path, branch=BR)
+
+        tmpdir = self.get_temp_path()
+
+        ret = repo.can_merge(tmpdir,
+                             from_repo_path, BR, BARE_REPO_OTHER_BRANCH,
+                             remote_name='hub/xxxproject')
+        assert ret is True
