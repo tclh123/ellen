@@ -247,10 +247,12 @@ class Jagare(object):
                          remote_name=remote_name, no_ff=no_ff)
         return sha
 
-    def can_merge(self, tmpdir, from_repo, to_repo, from_ref, to_ref,
+    # TODO: add UT
+    def can_merge(self, tmpdir, from_repo_path, from_ref, to_ref,
                   remote_name=None):
         """test auto merge"""
-        ret = can_merge(tmpdir, from_repo, to_repo, from_ref, to_ref,
+        from_repo = Jagare(from_repo_path)
+        ret = can_merge(tmpdir, from_repo, self, from_ref, to_ref,
                         remote_name)
         return ret
 
