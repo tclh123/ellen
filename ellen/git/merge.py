@@ -67,7 +67,10 @@ def can_merge(tmpdir, from_repo, to_repo, from_ref, to_ref,
     tmp_repo, ref = _clone_and_fetch(from_repo, to_repo, worktree,
                                      from_ref, to_ref, remote_name)
 
-    result = tmp_repo.merge_commits(to_ref, ref)
+    try:
+        result = tmp_repo.merge_commits(to_ref, ref)
+    except KeyError:  # dummy result
+        result = {}
 
     if result and result['has_conflicts'] is False:
         return True
