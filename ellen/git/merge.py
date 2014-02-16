@@ -51,7 +51,8 @@ def merge_flow(merger_name, merger_email,
     result = tmp_repo.push('origin', to_ref,
                            _env={env_commiter_key: merger_name})
     if result['returncode'] != 0:
-        raise RepoPushError
+        # raise RepoPushError
+        assert 0, (tmpdir, to_ref, result)
     merge_commit_sha = to_repo.sha(to_ref)
 
     if merge_commit_sha is None:
