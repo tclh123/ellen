@@ -40,23 +40,23 @@ def merge_flow(merger_name, merger_email,
 
     worktree = tmpdir
     merge_commit_sha = None
-    try:
-        tmp_repo, ref = _clone_and_fetch(from_repo, to_repo, worktree,
-                                         from_ref, to_ref, remote_name)
 
-        result = tmp_repo.merge(ref, message_header, message_body,
-                                no_ff=no_ff, _env=env)
-        if result['returncode'] != 0:
-            raise RepoMergeError
-        result = tmp_repo.push('origin', to_ref,
-                               _env={env_commiter_key: merger_name})
-        if result['returncode'] != 0:
-            raise RepoPushError
-        merge_commit_sha = to_repo.sha(to_ref)
-    except RepoMergeError:
-        pass
-    except RepoPushError:
-        pass
+    tmp_repo, ref = _clone_and_fetch(from_repo, to_repo, worktree,
+                                     from_ref, to_ref, remote_name)
+
+    result = tmp_repo.merge(ref, message_header, message_body,
+                            no_ff=no_ff, _env=env)
+    if result['returncode'] != 0:
+        raise RepoMergeError
+    result = tmp_repo.push('origin', to_ref,
+                           _env={env_commiter_key: merger_name})
+    if result['returncode'] != 0:
+        raise RepoPushError
+    merge_commit_sha = to_repo.sha(to_ref)
+
+    if merge_commit_sha is None:
+        assert 0, (tmpdir, result)
+
     return merge_commit_sha
 
 
